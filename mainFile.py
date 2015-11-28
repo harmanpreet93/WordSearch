@@ -146,67 +146,6 @@ def checkOverlap(l1,r1,l2,r2):
     return True
 
 
-def withinLengthRange(rectBox,widthLimit):
-    width = rectBox[2]
-    if width > 0.1*widthLimit and width < 1.7*widthLimit:
-        return True
-    else:
-        return False
-
-def searchAndLabelWord(resultImage,bb_mask,wordWithBox,bwImageForTess,boundRect,wordToSearch,widthLimit):
-    rectNum = len(boundRect)
-    color = Scalar(0,0,255)
-
-    for i in range(0,rectNum):
-        if withinLengthRange(boundRect[i],widthLimit):
-            
-
-
-
-
-static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithBox, Mat & bwImageForTess, \
-                       vector<Rect> & boundRect, string & wordToSearch, int & widthLimit) {
-  int rectNum = boundRect.size();
-  Scalar color = Scalar(0,0,255);
-  for (int i = 0; i < rectNum; i++) {
-      if (withinLengthRange(boundRect[i], widthLimit)) {
-        Mat wordWindow(bwImageForTess, boundRect[i]);
-        Mat wordWindowWithPadding = addPadding(wordWindow);
-        //string wordWindowName = "word_" + to_string(i) + ".jpg";
-        //imwrite(wordWindowName, wordWindowWithPadding);
-        //string sResult = textRecognition(wordWindow);
-        string sResult = textRecognition(wordWindowWithPadding);
-        //writeFile(sResult);
-        
-        //only circle out the mached words
-        int matchCode = isMatch(sResult, wordToSearch);
-        if ( matchCode >= 0) {
-           //exactl match: red
-          if (matchCode == 0) {
-           rectangle(resultImage, boundRect[i], color, 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], color, 4, 8, 0);
-          }
-          else if (matchCode == 1) {
-           // not exactly match: blue
-           rectangle(resultImage, boundRect[i], Scalar(255, 0, 0), 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], Scalar(255, 0, 0), 4, 8, 0);
-          }
-          else if (matchCode == 2) {
-            //even further: green
-           rectangle(resultImage, boundRect[i], Scalar(0, 255, 0), 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], Scalar(0, 255, 0), 4, 8, 0);
-          }
-        }
-//      ostringstream convert; 
-//      convert << i;
-//      string fileNum = convert.str();
-//      string fileName = "bounding" + fileNum + ".jpg";    
-//      imwrite(fileName, wordWindowWithPadding);
-      }
-      rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
-  }
-}
-
 if __name__ == "__main__":
     # Read input user image from getInputImage
     inputImg = readInputImage()
@@ -260,8 +199,7 @@ if __name__ == "__main__":
 
     drawBoxes(copyImage,boundRect)
 
-    searchAndLabelWord(resultImage, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
-
+    
 
 
 
