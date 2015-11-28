@@ -51,17 +51,43 @@ def findCharSize(boundRect,numLetters):
 
     return areaAvg,cHeight,cWidth,widthLimit
 
-def mergeBox(boundRect,cHeight,cWidth):
+def mergeBox(boundRect,cHeight,cWidth,cArea):
     emptyRect = [0,0,0,0]
-    for k in range(5):
+    for k in range(6):
         for i in range(0,len(boundRect)):
             # check for boundRect if already set to nullRect
             for j in range(i+1,len(boundRect)):
-                if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
-                    boundRect[j] = emptyRect
-                elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
+                # if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
+                #     boundRect[j] = emptyRect
+                # elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[j],boundRect[i]):
+                #     boundRect[i] = emptyRect
+                #     # break
+                if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
                     boundRect = mergeBoundRect(boundRect,i,j)
                     break
+
+    for i in xrange(0,len(boundRect)):
+        for j in xrange(i+1,len(boundRect)):
+            # area = boundRect[j][2] * boundRect[j][3]
+            if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]) and boundRect[i][2] * boundRect[i][3] < 50*cArea:
+                boundRect[j] = emptyRect
+            elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[j],boundRect[i]) and boundRect[j][2]*boundRect[j][3] < 50*cArea:
+                boundRect[i] = emptyRect
+                break
+
+    # for k in range(2):
+    #     for i in range(0,len(boundRect)):
+    #         # check for boundRect if already set to nullRect
+    #         for j in range(i+1,len(boundRect)):
+    #             # if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
+    #             #     boundRect[j] = emptyRect
+    #             # elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[j],boundRect[i]):
+    #             #     boundRect[i] = emptyRect
+    #             #     # break
+    #             if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
+    #                 boundRect = mergeBoundRect(boundRect,i,j)
+    #                 break
+
     return boundRect
 
 def mergeBoundRect(boundRect,i,j):
@@ -84,7 +110,7 @@ def mergeBoundRect(boundRect,i,j):
 
 
 def clearNullRect(boundRect,cArea):
-    boundRect = [x for x in boundRect if (x[2]*x[3] != 0 and x[2]*x[3] >= 0.35*cArea and x[2]*x[3] <= 22*cArea)]
+    boundRect = [x for x in boundRect if (x[2]*x[3] != 0 and x[2]*x[3] >= 0.35*cArea and x[2]*x[3] <= 50*cArea)]
     return boundRect
 
 def textRecognition(img):
@@ -132,7 +158,7 @@ def findEditDistance(str1, str2, cutoff, order):
 
 #check if one rectangle is inside another
 def isInside(rect1, rect2):
-    if rect1[0]<rect2[0] and rect1[1]<rect2[1] and (rect1[0]+rect1[2])>(rect2[0]+rect2[2]) and (rect1[1]+rect1[3])>(rect2[0]+rect2[3]):
+    if rect1[0]<=rect2[0] and rect1[1]<rect2[1] and (rect1[0]+rect1[2])>=(rect2[0]+rect2[2]) and (rect1[1]+rect1[3])>=(rect2[1]+rect2[3]):
         return True
     else:
         return False
@@ -303,12 +329,12 @@ if __name__ == "__main__":
 
     # print cHeight
 
-    boundRect = mergeBox(boundRect,cHeight,cWidth)
+    boundRect = mergeBox(boundRect,cHeight,cWidth,cArea)
     boundRect = clearNullRect(boundRect,cArea)
 
     drawBoxes(copyImage,boundRect)
 
-    resultImage,bb_mask = searchAndLabelWord(bb_mask, wordWithBox, bwImageForTess, boundRect, searchWord, widthLimit)
+    # resultImage,bb_mask = searchAndLabelWord(bb_mask, wordWithBox, bwImageForTess, boundRect, searchWord, widthLimit)
     
-    cv2.imwrite("bb_mask.jpg", bb_mask)
-    cv2.imwrite("result_image.jpg",resultImage)
+    # cv2.imwrite("bb_mask.jpg", bb_mask)
+    # cv2.imwrite("result_image.jpg",resultImage)
