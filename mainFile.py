@@ -259,13 +259,3 @@ if __name__ == "__main__":
     boundRect = clearNullRect(boundRect,cArea)
 
     drawBoxes(copyImage,boundRect)
-
-
-def addPadding(wordWindow):
-    top = int(wordWindow.shape[0])
-    bottom = int(wordWindow.shape[0])
-    left = int(wordWindow.shape[1])
-    right = int(wordWindow.shape[1])
-
-    cv2.copyMakeBorder(wordWindow, wordWindowWithPadding, top, bottom, left, right, cv2.BORDER_CONSTANT, (0,0,0))
-    return wordWindowWithPadding
