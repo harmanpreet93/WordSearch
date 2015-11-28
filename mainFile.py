@@ -84,6 +84,8 @@ def clearNullRect(boundRect,cArea):
     boundRect = [x for x in boundRect if (x[2]*x[3] != 0 and x[2]*x[3] >= 0.35*cArea and x[2]*x[3] <= 22*cArea)]
     return boundRect
 
+
+#check if rectangles are neighbours of each other
 def isNeighbour(rect1,rect2,cHeight,cWidth):
 
     if rect1[2]*rect1[3] == 0 or rect2[2]*rect2[3] == 0:
