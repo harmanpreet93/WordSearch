@@ -6,7 +6,7 @@ def getSearchWord():
 
 def readInputImage():
 	# inputImg = raw_input("Please provide the input image to search: ")
-	inputImg = 'l.png'
+	inputImg = 'i.png'
 	# print "Image path you entered is: ", inputImg
 
 	# Check if valid image path and valid image extension

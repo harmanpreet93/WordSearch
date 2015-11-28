@@ -58,7 +58,7 @@ def mergeBox(boundRect,cHeight,cWidth):
             # check for boundRect if already set to nullRect
             for j in range(i+1,len(boundRect)):
                 if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
-                    boundRect = boundRect.remove(boundRect[j])
+                    boundRect[j] = emptyRect
                 elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
                     boundRect = mergeBoundRect(boundRect,i,j)
                     break
@@ -310,5 +310,5 @@ if __name__ == "__main__":
 
     resultImage,bb_mask = searchAndLabelWord(bb_mask, wordWithBox, bwImageForTess, boundRect, searchWord, widthLimit)
     
-    # imwrite("./output/bb_mask.jpg", bb_mask)
-    # imwrite("./output/result_image.jpg", resultImage)
+    cv2.imwrite("bb_mask.jpg", bb_mask)
+    cv2.imwrite("result_image.jpg",resultImage)
