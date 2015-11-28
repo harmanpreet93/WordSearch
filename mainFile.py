@@ -69,6 +69,7 @@ def mergeBoundRect(boundRect,i,j):
     
     # mergedRect = (left,top,right-left,bottom-top )
 
+    # mergedRect = (boundRect[i][0], boundRect[i][1], max(boundRect[i][2], boundRect[j][2]), boundRect[j][1]+boundRect[j][3]-boundRect[i][1])
     mergedRect = (boundRect[i][0], boundRect[i][1], boundRect[j][0]+boundRect[j][2]-boundRect[i][0], max(boundRect[i][3],boundRect[j][3]) )
     #store x,y,w,h for an empty rectangle, i.e., a point
     emptyRect = [0,0,0,0]
@@ -169,32 +170,21 @@ if __name__ == "__main__":
 
     # plotImage(binarizedImg)
 
-    # skipped deskew wala part for now
+    # skipped deskew part for now
 
-    # in else of extract_text.cpp
-    # print binarizedImg.shape
     size = binarizedImg.shape[0],binarizedImg.shape[1],3
     blankImage = np.zeros(size, dtype=np.uint8)
 
     bwImageForTess = np.copy(binarizedImg)
 
-    # bwimage is binarizedImg
     wordWithBox = cv2.cvtColor(binarizedImg,cv2.COLOR_GRAY2RGB)
 
     ret,thresh = cv2.threshold(filteredImage,127,255,0)
     outputImg,contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    outputImg = cv2.drawContours(filteredImage,contours,-1,(0,255,0),3)
+    outputImg = cv2.drawContours(outputImg,contours,-1,(0,255,0),3)
 
     # plotImage(outputImg)
-
     letterWithBox = np.copy(wordWithBox);
-
-    # searchAndLabelWord(resultImage, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
-    # // output result
-    # //imwrite("result_image.jpg", resultImage);
-    # imwrite("./output/bb_mask.jpg", bb_mask);
-    # imwrite("./output/result_image.jpg", resultImage);
-
     boundRect = labelLettersWithBox(inputImg, contours)
 
     cArea,cHeight,cWidth,widthLimit = findCharSize(boundRect,numLetters)
@@ -202,7 +192,7 @@ if __name__ == "__main__":
     # print cHeight
 
     boundRect = mergeBox(boundRect,cHeight,cWidth)
-    # boundRect = clearNullRect(boundRect,cArea)
+    boundRect = clearNullRect(boundRect,cArea)
 
     drawBoxes(copyImage,boundRect)
 
