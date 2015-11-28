@@ -211,38 +211,40 @@ def withinLengthRange(rectBox,widthLimit):
         return False
 
 
-def searchAndLabelWord(resultImage,bb_mask,wordWithBox,bwImageForTess,boundRect,wordToSearch,widthLimit):
-    rectNum = len(boundRect)
-    color = Scalar(0,0,255)
+def searchAndLabelWord(bb_mask,wordWithBox,bwImageForTess,boundRect,searchWord,widthLimit):
 
-    for i in range(0,rectNum):
+    for i in range(0,len(boundRect)):
+        pt1 = (boundRect[i][0],boundRect[i][1])
+        pt2 = (pt1[0]+boundRect[i][2],pt1[1]+boundRect[i][3])
+        
         if withinLengthRange(boundRect[i],widthLimit):
             wordWindow = bwImageForTess[boundRect[i][0]:boundRect[i][0]+boundRect[i][2],boundRect[i][1]:boundRect[i][1]+boundRect[i][3]]
             wordWindowWithPadding = addPadding(wordWindow)
 
             sResult = textRecognition(wordWindowWithPadding)
-
-            matchCode = isMatch(sResult,wordToSearch)
+            
+            matchCode = isMatch(sResult,searchWord)
             if matchCode >= 0:
                 # exact match: red
                 if (matchCode == 0):
-                    pt1 = (boundRect[i][0],boundRect[i][1])
-                    pt2 = (pt1[0]+boundRect[i][2],pt1[1]+boundRect[i][3])
-
+                    color = Scalar(0,0,255)
                     cv2.rectangle(resultImage,pt1,pt2,color,4,8,0)
                     cv2.rectangle(bb_mask,pt1,pt2,color,4,8,0)
 
-                    # rectangle(bb_mask, boundRect[i], color, 4, 8, 0);
-
-                # elif matchCode == 1:
-                #     # not exactly match: blue
-                #     rectangle(resultImage, boundRect[i], Scalar(255, 0, 0), 4, 8, 0)
-                #     rectangle(bb_mask, boundRect[i], Scalar(255, 0, 0), 4, 8, 0)
+                elif matchCode == 1:
+                    # not exactly match: blue
+                    color = Scalar(0,0,255)
+                    cv2.rectangle(resultImage,pt1,pt2,color,4,8,0)
+                    cv2.rectangle(bb_mask,pt1,pt2,color,4,8,0)
                 
-                # elif matchCode == 2:
-                #     # even further: green
-                #     rectangle(resultImage, boundRect[i], Scalar(0, 255, 0), 4, 8, 0)
-                #     rectangle(bb_mask, boundRect[i], Scalar(0, 255, 0), 4, 8, 0)
+                elif matchCode == 2:
+                    # even further: green
+                    color = Scalar(0,255,0)
+                    cv2.rectangle(resultImage,pt1,pt2,color,4,8,0)
+                    cv2.rectangle(bb_mask,pt1,pt2,color,4,8,0)
+
+        cv2.rectangle(wordWithBox,pt1,pt2,(0,0,255),4,8,0)
+    return resultImage,bb_mask
 
 
 if __name__ == "__main__":
@@ -297,3 +299,8 @@ if __name__ == "__main__":
     boundRect = clearNullRect(boundRect,cArea)
 
     drawBoxes(copyImage,boundRect)
+
+    resultImage,bb_mask = searchAndLabelWord(bb_mask, wordWithBox, bwImageForTess, boundRect, searchWord, widthLimit)
+    
+    # imwrite("./output/bb_mask.jpg", bb_mask)
+    # imwrite("./output/result_image.jpg", resultImage)
