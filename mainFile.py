@@ -58,7 +58,10 @@ def mergeBox(boundRect,cHeight,cWidth):
             # check for boundRect if already set to nullRect
             for j in range(i+1,len(boundRect)):
                 if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
-                    boundRect = boundRect.remove(boundRect[j])
+                    boundRect[j] = emptyRect
+                elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[j],boundRect[i]):
+                    boundRect[i] = emptyRect
+                    break
                 elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
                     boundRect = mergeBoundRect(boundRect,i,j)
                     break
