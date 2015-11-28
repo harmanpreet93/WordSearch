@@ -135,17 +135,6 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
         return False
 
 # Returns true if two rectangles (l1, r1) and (l2, r2) overlap
-# def checkOverlap(rect1,rect2):
-#     left = max(rect1[0], rect2[0])
-#     top  = max(rect1[1], rect2[1])
-#     right = min(rect1[0] + rect1[2], rect2[0] + rect2[2])
-#     bottom = min(rect1[1] + rect1[3], rect2[1] + rect2[3])
-#     if(left <= right and top <= bottom):
-#         return True
-#     else:
-#         return False
-
-# Returns true if two rectangles (l1, r1) and (l2, r2) overlap
 def checkOverlap(l1,r1,l2,r2):
      # If one rectangle is on left side of other
     if (l1[0] > r2[0] or l2[0] > r1[0]):
@@ -165,59 +154,39 @@ def withinLengthRange(rectBox,widthLimit):
     else:
         return False
 
+
 def searchAndLabelWord(resultImage,bb_mask,wordWithBox,bwImageForTess,boundRect,wordToSearch,widthLimit):
     rectNum = len(boundRect)
     color = Scalar(0,0,255)
 
     for i in range(0,rectNum):
         if withinLengthRange(boundRect[i],widthLimit):
-            
+            wordWindow = bwImageForTess[boundRect[i][0]:boundRect[i][0]+boundRect[i][2],boundRect[i][1]:boundRect[i][1]+boundRect[i][3]]
+            wordWindowWithPadding = addPadding(wordWindow)
 
+            sResult = textRecognition(wordWindowWithPadding)
 
+            matchCode = isMatch(sResult,wordToSearch)
+            if matchCode >= 0:
+                # exact match: red
+                if (matchCode == 0):
+                    pt1 = (boundRect[i][0],boundRect[i][1])
+                    pt2 = (pt1[0]+boundRect[i][2],pt1[1]+boundRect[i][3])
 
+                    cv2.rectangle(resultImage,pt1,pt2,color,4,8,0)
+                    cv2.rectangle(bb_mask,pt1,pt2,color,4,8,0)
+                    # rectangle(bb_mask, boundRect[i], color, 4, 8, 0);
 
-static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithBox, Mat & bwImageForTess, \
-                       vector<Rect> & boundRect, string & wordToSearch, int & widthLimit) {
-  int rectNum = boundRect.size();
-  Scalar color = Scalar(0,0,255);
-  for (int i = 0; i < rectNum; i++) {
-      if (withinLengthRange(boundRect[i], widthLimit)) {
-        Mat wordWindow(bwImageForTess, boundRect[i]);
-        Mat wordWindowWithPadding = addPadding(wordWindow);
-        //string wordWindowName = "word_" + to_string(i) + ".jpg";
-        //imwrite(wordWindowName, wordWindowWithPadding);
-        //string sResult = textRecognition(wordWindow);
-        string sResult = textRecognition(wordWindowWithPadding);
-        //writeFile(sResult);
-        
-        //only circle out the mached words
-        int matchCode = isMatch(sResult, wordToSearch);
-        if ( matchCode >= 0) {
-           //exactl match: red
-          if (matchCode == 0) {
-           rectangle(resultImage, boundRect[i], color, 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], color, 4, 8, 0);
-          }
-          else if (matchCode == 1) {
-           // not exactly match: blue
-           rectangle(resultImage, boundRect[i], Scalar(255, 0, 0), 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], Scalar(255, 0, 0), 4, 8, 0);
-          }
-          else if (matchCode == 2) {
-            //even further: green
-           rectangle(resultImage, boundRect[i], Scalar(0, 255, 0), 4, 8, 0);
-           rectangle(bb_mask, boundRect[i], Scalar(0, 255, 0), 4, 8, 0);
-          }
-        }
-//      ostringstream convert; 
-//      convert << i;
-//      string fileNum = convert.str();
-//      string fileName = "bounding" + fileNum + ".jpg";    
-//      imwrite(fileName, wordWindowWithPadding);
-      }
-      rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
-  }
-}
+                # elif matchCode == 1:
+                #     # not exactly match: blue
+                #     rectangle(resultImage, boundRect[i], Scalar(255, 0, 0), 4, 8, 0)
+                #     rectangle(bb_mask, boundRect[i], Scalar(255, 0, 0), 4, 8, 0)
+                
+                # elif matchCode == 2:
+                #     # even further: green
+                #     rectangle(resultImage, boundRect[i], Scalar(0, 255, 0), 4, 8, 0)
+                #     rectangle(bb_mask, boundRect[i], Scalar(0, 255, 0), 4, 8, 0)
+
 
 if __name__ == "__main__":
     # Read input user image from getInputImage
@@ -249,7 +218,7 @@ if __name__ == "__main__":
     # skipped deskew part for now
 
     size = binarizedImg.shape[0],binarizedImg.shape[1],3
-    blankImage = np.zeros(size, dtype=np.uint8)
+    bb_mask = np.zeros(size, dtype=np.uint8)
 
     bwImageForTess = np.copy(binarizedImg)
 
