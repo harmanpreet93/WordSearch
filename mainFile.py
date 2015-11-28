@@ -36,14 +36,16 @@ def findCharSize(boundRect,numLetters):
             areaMap[area] = 1
 
     sorted_area = sorted(areaMap.items(), key=lambda x:x[1],reverse=True)
-    # sorted_area = sorted(areaMap,key=areaMap.get)
-    # print sorted_area[0:20]
+    
     areaAvg = 0.0
     for key in sorted_area[0:10]:
         areaAvg += key[0]
     areaAvg = areaAvg / 10.0;
-    cHeight = (areaAvg) **0.5 * 1.1;
-    cWidth = (areaAvg) **0.5 * 0.75;
+    math.pow(3, 0)
+    cHeight = math.pow(areaAvg,0.5)*1.1
+    cWidth = math.pow(areaAvg,0.5)*0.75
+    # cHeight = (areaAvg) **0.5 * 1.1;
+    # cWidth = (areaAvg) **0.5 * 0.75;
     cArea = areaAvg;
     widthLimit = numLetters * cWidth;
 
@@ -55,24 +57,35 @@ def mergeBox(boundRect,cHeight,cWidth):
         # check for boundRect if already set to nullRect
         for j in range(i+1,len(boundRect)):
             if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
-                mergeBoundRect(boundRect,i,j)
+                boundRect = mergeBoundRect(boundRect,i,j)
                 break
+    return boundRect
 
 def mergeBoundRect(boundRect,i,j):
+    # left = max(boundRect[i][0], boundRect[j][0])
+    # top  = max(boundRect[i][1], boundRect[j][1])
+    # right = min(boundRect[i][0] + boundRect[i][2], boundRect[j][0] + boundRect[j][2])
+    # bottom = min(boundRect[i][1] + boundRect[i][3], boundRect[j][1] + boundRect[j][3])
+    
+    # mergedRect = (left,top,right-left,bottom-top )
+
     mergedRect = (boundRect[i][0], boundRect[i][1], boundRect[j][0]+boundRect[j][2]-boundRect[i][0], max(boundRect[i][3],boundRect[j][3]) )
     #store x,y,w,h for an empty rectangle, i.e., a point
     emptyRect = [0,0,0,0]
-    boundRect[i] = emptyRect
+    # boundRect[i] = emptyRect
+    boundRect[i] = mergedRect
     boundRect[j] = emptyRect
-    boundRect.append(mergedRect)
+    # boundRect.append(mergedRect)
+    return boundRect
 
 
 def clearNullRect(boundRect,cArea):
     boundRect = [x for x in boundRect if (x[2]*x[3] != 0 and x[2]*x[3] >= 0.35*cArea and x[2]*x[3] <= 22*cArea)]
+    return boundRect
 
 def isNeighbour(rect1,rect2,cHeight,cWidth):
 
-    if rect1[2]*rect2[3] == 0 or rect2[2]*rect2[3] == 0:
+    if rect1[2]*rect1[3] == 0 or rect2[2]*rect2[3] == 0:
         return False
 
     y1 = rect1[1]+(rect1[1]+rect1[3])
@@ -80,10 +93,10 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
 
     dy = abs(y1 - y2)/2
 
-    dy1 = abs(rect1[1] - rect2[1]);
+    dy1 = abs(rect1[1] - rect2[1])
     dy2 = abs(rect1[1]+rect1[3] - (rect2[1]+rect2[3]))
 
-    dx1 = abs(rect1[0] - (rect2[0]) + rect2[2])
+    dx1 = abs(rect1[0] - rect2[0] - rect2[2])
     dx2 = abs(rect1[0] + rect1[2] - rect2[0])
 
     # if ((rect1 & rect2).area() != 0 ):
@@ -94,8 +107,10 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
     l2 = [rect2[0],rect2[1]]
     r2 = [l2[0]+rect2[2],l2[1]+rect2[3]]
     
-    # two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
+    # two dx is because when the bounding box becomes a rectangle, the original dx will not work anymore
     # two rectangles intersect
+    # if checkOverlap(rect1,rect2):
+        # return True
     if checkOverlap(l1,r1,l2,r2):
         return True
 
@@ -105,8 +120,18 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
         return False
 
 # Returns true if two rectangles (l1, r1) and (l2, r2) overlap
-def checkOverlap(l1,r1,l2,r2):
+# def checkOverlap(rect1,rect2):
+#     left = max(rect1[0], rect2[0])
+#     top  = max(rect1[1], rect2[1])
+#     right = min(rect1[0] + rect1[2], rect2[0] + rect2[2])
+#     bottom = min(rect1[1] + rect1[3], rect2[1] + rect2[3])
+#     if(left <= right and top <= bottom):
+#         return True
+#     else:
+#         return False
 
+# Returns true if two rectangles (l1, r1) and (l2, r2) overlap
+def checkOverlap(l1,r1,l2,r2):
      # If one rectangle is on left side of other
     if (l1[0] > r2[0] or l2[0] > r1[0]):
         return False
@@ -170,16 +195,16 @@ if __name__ == "__main__":
     # imwrite("./output/bb_mask.jpg", bb_mask);
     # imwrite("./output/result_image.jpg", resultImage);
 
-    boundRect = labelLettersWithBox(letterWithBox, contours)
+    boundRect = labelLettersWithBox(inputImg, contours)
 
-    cHeight,cWidth,cArea,widthLimit = findCharSize(boundRect,numLetters)
+    cArea,cHeight,cWidth,widthLimit = findCharSize(boundRect,numLetters)
 
     # print cHeight
 
-    mergeBox(boundRect,cHeight,cWidth)
-    clearNullRect(boundRect,cArea)
+    boundRect = mergeBox(boundRect,cHeight,cWidth)
+    # boundRect = clearNullRect(boundRect,cArea)
 
-    drawBoxes(inputImg,boundRect)
+    drawBoxes(copyImage,boundRect)
 
 
 
