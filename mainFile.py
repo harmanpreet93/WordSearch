@@ -57,7 +57,9 @@ def mergeBox(boundRect,cHeight,cWidth):
         for i in range(0,len(boundRect)):
             # check for boundRect if already set to nullRect
             for j in range(i+1,len(boundRect)):
-                if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
+                if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isInside(boundRect[i],boundRect[j]):
+                    boundRect = boundRect.remove(boundRect[j])
+                elif (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
                     boundRect = mergeBoundRect(boundRect,i,j)
                     break
     return boundRect
@@ -128,6 +130,12 @@ def findEditDistance(str1, str2, cutoff, order):
         return min(dist1,dist2,dist3)
     return -1
 
+#check if one rectangle is inside another
+def isInside(rect1, rect2):
+    if rect1[0]<rect2[0] and rect1[1]<rect2[1] and (rect1[0]+rect1[2])>(rect2[0]+rect2[2]) and (rect1[1]+rect1[3])>(rect2[0]+rect2[3]):
+        return True
+    else:
+        return False
 
 #check if rectangles are neighbours of each other
 def isNeighbour(rect1,rect2,cHeight,cWidth):
