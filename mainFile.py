@@ -84,6 +84,18 @@ def clearNullRect(boundRect,cArea):
     boundRect = [x for x in boundRect if (x[2]*x[3] != 0 and x[2]*x[3] >= 0.35*cArea and x[2]*x[3] <= 22*cArea)]
     return boundRect
 
+def textRecognition(img):
+    return pytesseract.image_to_string(img)
+
+def addPadding(wordWindow):
+    top = int(wordWindow.shape[0])
+    bottom = int(wordWindow.shape[0])
+    left = int(wordWindow.shape[1])
+    right = int(wordWindow.shape[1])
+
+    cv2.copyMakeBorder(wordWindow, wordWindowWithPadding, top, bottom, left, right, cv2.BORDER_CONSTANT, (0,0,0))
+    return wordWindowWithPadding
+
 
 #check if rectangles are neighbours of each other
 def isNeighbour(rect1,rect2,cHeight,cWidth):
