@@ -53,24 +53,25 @@ def findCharSize(boundRect,numLetters):
 
 def mergeBox(boundRect,cHeight,cWidth):
     emptyRect = [0,0,0,0]
-    for i in range(0,len(boundRect)):
-        # check for boundRect if already set to nullRect
-        for j in range(i+1,len(boundRect)):
-            if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
-                boundRect = mergeBoundRect(boundRect,i,j)
-                break
+    for k in range(5):
+        for i in range(0,len(boundRect)):
+            # check for boundRect if already set to nullRect
+            for j in range(i+1,len(boundRect)):
+                if (boundRect[i] != emptyRect and boundRect[j] != emptyRect) and isNeighbour(boundRect[i],boundRect[j],cHeight,cWidth):
+                    boundRect = mergeBoundRect(boundRect,i,j)
+                    break
     return boundRect
 
 def mergeBoundRect(boundRect,i,j):
-    # left = max(boundRect[i][0], boundRect[j][0])
-    # top  = max(boundRect[i][1], boundRect[j][1])
-    # right = min(boundRect[i][0] + boundRect[i][2], boundRect[j][0] + boundRect[j][2])
-    # bottom = min(boundRect[i][1] + boundRect[i][3], boundRect[j][1] + boundRect[j][3])
+    left = min(boundRect[i][0], boundRect[j][0])
+    top  = min(boundRect[i][1], boundRect[j][1])
+    right = max(boundRect[i][0] + boundRect[i][2], boundRect[j][0] + boundRect[j][2])
+    bottom = max(boundRect[i][1] + boundRect[i][3], boundRect[j][1] + boundRect[j][3])
     
-    # mergedRect = (left,top,right-left,bottom-top )
+    mergedRect = (left,top,right-left,bottom-top )
 
     # mergedRect = (boundRect[i][0], boundRect[i][1], max(boundRect[i][2], boundRect[j][2]), boundRect[j][1]+boundRect[j][3]-boundRect[i][1])
-    mergedRect = (boundRect[i][0], boundRect[i][1], boundRect[j][0]+boundRect[j][2]-boundRect[i][0], max(boundRect[i][3],boundRect[j][3]) )
+    # mergedRect = (boundRect[i][0], boundRect[i][1], boundRect[j][0]+boundRect[j][2]-boundRect[i][0], max(boundRect[i][3],boundRect[j][3]) )
     #store x,y,w,h for an empty rectangle, i.e., a point
     emptyRect = [0,0,0,0]
     # boundRect[i] = emptyRect
@@ -106,7 +107,8 @@ def isMatch(result, wordToSearch):
         return 1
     elif ration<0.43 and dis>0:
         return 2
-    else return -1
+    else:
+        return -1
 
 def findEditDistance(str1, str2, cutoff, order):
     if str1 == str2:
@@ -133,6 +135,19 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
     if rect1[2]*rect1[3] == 0 or rect2[2]*rect2[3] == 0:
         return False
 
+    l1 = [rect1[0],rect1[1]]
+    r1 = [l1[0]+rect1[2],l1[1]+rect1[3]]
+    l2 = [rect2[0],rect2[1]]
+    r2 = [l2[0]+rect2[2],l2[1]+rect2[3]]
+    
+    # two dx is because when the bounding box becomes a rectangle, the original dx will not work anymore
+    # two rectangles intersect
+    # if checkOverlap(rect1,rect2):
+        # return True
+    # if checkOverlap(l1,r1,l2,r2):
+    if checkOverlap(rect1,rect2):
+        return True
+
     y1 = rect1[1]+(rect1[1]+rect1[3])
     y2 = rect2[1]+(rect2[1]+rect2[3])
 
@@ -147,17 +162,17 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
     # if ((rect1 & rect2).area() != 0 ):
     #   return true
     
-    l1 = [rect1[0],rect1[1]]
-    r1 = [l1[0]+rect1[2],l1[1]+rect1[3]]
-    l2 = [rect2[0],rect2[1]]
-    r2 = [l2[0]+rect2[2],l2[1]+rect2[3]]
+    # l1 = [rect1[0],rect1[1]]
+    # r1 = [l1[0]+rect1[2],l1[1]+rect1[3]]
+    # l2 = [rect2[0],rect2[1]]
+    # r2 = [l2[0]+rect2[2],l2[1]+rect2[3]]
     
-    # two dx is because when the bounding box becomes a rectangle, the original dx will not work anymore
-    # two rectangles intersect
-    # if checkOverlap(rect1,rect2):
-        # return True
-    if checkOverlap(l1,r1,l2,r2):
-        return True
+    # # two dx is because when the bounding box becomes a rectangle, the original dx will not work anymore
+    # # two rectangles intersect
+    # # if checkOverlap(rect1,rect2):
+    #     # return True
+    # if checkOverlap(l1,r1,l2,r2):
+    #     return True
 
     if ((dy < 0.65 * cHeight or dy1 < 0.28 * cHeight or dy2 < 0.32 * cHeight)  and (dx1 < 0.31 * cWidth or dx2 < 0.31 *cWidth)):
         return True
@@ -165,14 +180,25 @@ def isNeighbour(rect1,rect2,cHeight,cWidth):
         return False
 
 # Returns true if two rectangles (l1, r1) and (l2, r2) overlap
-def checkOverlap(l1,r1,l2,r2):
-     # If one rectangle is on left side of other
-    if (l1[0] > r2[0] or l2[0] > r1[0]):
+# def checkOverlap(l1,r1,l2,r2):
+def checkOverlap(rect1,rect2):
+    left = max(rect1[0], rect2[0])
+    top  = max(rect1[1], rect2[1])
+    right = min(rect1[0] + rect1[2], rect2[0] + rect2[2])
+    bottom = min(rect1[1] + rect1[3], rect2[1] + rect2[3])
+    
+    if(left <= right and top <= bottom):
+        return True
+    else:
         return False
+    
+    # If one rectangle is on left side of other
+    # if (l1[0] > r2[0] or l2[0] > r1[0]):
+    #     return False
 
-    # If one rectangle is above other
-    if (l1[1] < r2[1] or l2[1] < r1[1]):
-        return False
+    # # If one rectangle is above other
+    # if (l1[1] < r2[1] or l2[1] < r1[1]):
+    #     return False
 
     return True
 
@@ -205,6 +231,7 @@ def searchAndLabelWord(resultImage,bb_mask,wordWithBox,bwImageForTess,boundRect,
 
                     cv2.rectangle(resultImage,pt1,pt2,color,4,8,0)
                     cv2.rectangle(bb_mask,pt1,pt2,color,4,8,0)
+
                     # rectangle(bb_mask, boundRect[i], color, 4, 8, 0);
 
                 # elif matchCode == 1:
