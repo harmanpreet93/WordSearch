@@ -96,6 +96,36 @@ def addPadding(wordWindow):
     cv2.copyMakeBorder(wordWindow, wordWindowWithPadding, top, bottom, left, right, cv2.BORDER_CONSTANT, (0,0,0))
     return wordWindowWithPadding
 
+def isMatch(result, wordToSearch):
+    dist = findEditDistance(result, wordToSearch, len(wordToSearch)*0.3, 0)
+    ratio = dist/len(wordToSearch)
+
+    if dis == 0:
+        return 0
+    elif ratio<0.25 and dis>0:
+        return 1
+    elif ration<0.43 and dis>0:
+        return 2
+    else return -1
+
+def findEditDistance(str1, str2, cutoff, order):
+    if str1 == str2:
+        return 0
+    if order>cutoff:
+        return cutoff+1
+    if str1 == "":
+        return len(str2)
+    if str2 == "":
+        return len(str1)
+    if str1[0] == str2[0]:
+        return findEditDistance(str1[1:],str2[1:],cutoff,order)
+    if str1[0] != str2[0]:
+        dist1 = findEditDistance(str1,str2[1:],cutoff,order+1)+1
+        dist2 = findEditDistance(str2,str1[1:],cutoff,order+1)+1
+        dist3 = findEditDistance(str1[1:],str2[1:],cutoff,order+1)+1
+        return min(dist1,dist2,dist3)
+    return -1
+
 
 #check if rectangles are neighbours of each other
 def isNeighbour(rect1,rect2,cHeight,cWidth):
