@@ -2,10 +2,13 @@ Word Search
 
 Implementing Ctrl+F for scanned images 
 
-Requirements:
-	- OPENCV
-	- pytesser
+Project Requirements:
+OPENCV
+pytesser
 
+inputProcedures.py - contains all helper functions
+myImports.py - all import files
+pytesser.py - OCR in Python using the Tesseract engine from Google
 
 STEPS:
 
