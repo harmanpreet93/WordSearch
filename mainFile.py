@@ -18,38 +18,38 @@ if __name__ == "__main__":
     # apply filter
         # - medianBlur or gaussianBlur
         # - no argument applies medianBlur
-    filteredImage = applyFilter(grayImage,'gaussianBlur')
+    # filteredImage = applyFilter(grayImage,'medianBlur')
 
     # perform binarization
         # - simple, adaptive or otsu
         # - no argument applies adaptive
-    binarizedImg = applyBinarization(filteredImage,'otsu')
+    binarizedImg = applyBinarization(grayImage,'adaptive')
 
-    # plotImage(binarizedImg)
+    plotImage(binarizedImg)
 
-    size = binarizedImg.shape[0],binarizedImg.shape[1],3
-    bb_mask = np.zeros(size, dtype=np.uint8)
+    # size = binarizedImg.shape[0],binarizedImg.shape[1],3
+    # bb_mask = np.zeros(size, dtype=np.uint8)
 
-    bwImgForTess = np.copy(binarizedImg)
+    # bwImgForTess = np.copy(binarizedImg)
 
-    wordBox = cv2.cvtColor(binarizedImg,cv2.COLOR_GRAY2RGB)
+    # wordBox = cv2.cvtColor(binarizedImg,cv2.COLOR_GRAY2RGB)
 
-    ret,thresh = cv2.threshold(filteredImage,127,255,0)
-    outputImg,contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    outputImg = cv2.drawContours(outputImg,contours,-1,(0,255,0),3)
+    # ret,thresh = cv2.threshold(filteredImage,127,255,0)
+    # outputImg,contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    # outputImg = cv2.drawContours(outputImg,contours,-1,(0,255,0),3)
 
-    # plotImage(outputImg)
-    letterWithBox = np.copy(wordBox);
-    boundRectangle = labelLettersWithBox(inputImg, contours)
+    # # plotImage(outputImg)
+    # letterWithBox = np.copy(wordBox)
+    # boundRectangle = labelLettersWithBox(inputImg, contours)
 
-    cArea,cHeight,cWidth,widthLimit = findCharacterSize(boundRectangle,letterCount)
+    # cArea,cHeight,cWidth,widthLimit = findCharacterSize(boundRectangle,letterCount)
 
-    boundRectangle = mergeBox(boundRectangle,cHeight,cWidth,cArea)
-    boundRectangle = clearNullRectangles(boundRectangle,cArea)
+    # boundRectangle = mergeBox(boundRectangle,cHeight,cWidth,cArea)
+    # boundRectangle = clearNullRectangles(boundRectangle,cArea)
 
-    testImg = np.copy(copyImage)
-    drawBoxes(copyImage,boundRectangle)
+    # testImg = np.copy(copyImage)
+    # drawBoxes(copyImage,boundRectangle)
 
-    resultImage,bb_mask = searchAndLabelWord(bb_mask, wordBox, bwImgForTess, boundRectangle, searchWord, widthLimit,testImg)
+    # resultImage,bb_mask = searchAndLabelWord(bb_mask, wordBox, bwImgForTess, boundRectangle, searchWord, widthLimit,testImg)
     
-    plotImage(resultImage)
+    # plotImage(resultImage)
