@@ -1,6 +1,7 @@
-Word Search
+Word Search: 
 
-Implementing Ctrl+F for scanned images 
+	A tool to find and highlight instances of a given string in a given image. 
+
 
 Project Requirements:
 	
