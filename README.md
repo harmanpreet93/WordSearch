@@ -1,5 +1,5 @@
 ### Word Search
-#### A tool to find and highlight instances of a given string in a given image. 
+### A tool to find and highlight instances of a given string in a given image. 
 
 
 #### Project Requirements:  	
